@@ -31,9 +31,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	answers := make([]string, 0)
 	for _, line := range sliceOfLines {
-		fmt.Println(line[0])
-		fmt.Println(line[1])
+		answers = append(answers, line[1])
 	}
+	fmt.Println("This quiz had the following number of questions", len(answers))
 }
