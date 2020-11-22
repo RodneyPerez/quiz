@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"encoding/csv"
 	"flag"
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
 
 var fileName string
@@ -31,9 +33,23 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	answers := make([]string, 0)
+
+	numberOfQuestions := make([]string, 0)
+	rightAnswers := make([]int, 0)
+
 	for _, line := range sliceOfLines {
-		answers = append(answers, line[1])
+		fmt.Println("Question:", line[0])
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("Enter answer: ")
+		input, _ := reader.ReadString('\n')
+		cleanedInput := strings.TrimSpace(input)
+		if cleanedInput == line[1] {
+			rightAnswers = append(rightAnswers, 1)
+		}
+		numberOfQuestions = append(numberOfQuestions, line[1])
 	}
-	fmt.Println("This quiz had the following number of questions", len(answers))
+	score := (len(rightAnswers) / len(numberOfQuestions)) * 100
+	fmt.Println("This quiz had the following number of questions", len(numberOfQuestions))
+	fmt.Println("You got the following right", len(rightAnswers))
+	fmt.Println("Your Score was", score)
 }
