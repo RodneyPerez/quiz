@@ -34,8 +34,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	numberOfQuestions := make([]string, 0)
-	rightAnswers := make([]int, 0)
+	numberOfQuestions := 0
+	rightAnswers := 0
 
 	for _, line := range sliceOfLines {
 		fmt.Println("Question:", line[0])
@@ -44,12 +44,12 @@ func main() {
 		input, _ := reader.ReadString('\n')
 		cleanedInput := strings.TrimSpace(input)
 		if cleanedInput == line[1] {
-			rightAnswers = append(rightAnswers, 1)
+			rightAnswers = rightAnswers + 1
 		}
-		numberOfQuestions = append(numberOfQuestions, line[1])
+		numberOfQuestions = numberOfQuestions + 1
 	}
-	score := (len(rightAnswers) / len(numberOfQuestions)) * 100
-	fmt.Println("This quiz had the following number of questions", len(numberOfQuestions))
-	fmt.Println("You got the following right", len(rightAnswers))
+	score := (rightAnswers / numberOfQuestions) * 100
+	fmt.Println("This quiz had the following number of questions", numberOfQuestions)
+	fmt.Println("You got the following right", rightAnswers)
 	fmt.Println("Your Score was", score)
 }
