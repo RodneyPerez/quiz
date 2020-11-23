@@ -42,9 +42,9 @@ func main() {
 		input, _ := reader.ReadString('\n')
 		cleanedInput := strings.TrimSpace(input)
 		if cleanedInput == problem.answer {
-			rightAnswers = rightAnswers + 1
+			rightAnswers++
 		}
-		numberOfQuestions = numberOfQuestions + 1
+		numberOfQuestions++
 	}
 	score := (rightAnswers / numberOfQuestions) * 100
 	fmt.Println("This quiz had the following number of questions", numberOfQuestions)
@@ -57,7 +57,7 @@ func parseLines(lines [][]string) []problem {
 	for i, line := range lines {
 		ret[i] = problem{
 			question: line[0],
-			answer:   line[1],
+			answer:   strings.TrimSpace(line[1]),
 		}
 	}
 	return ret
