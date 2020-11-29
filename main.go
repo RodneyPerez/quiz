@@ -7,12 +7,17 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 )
 
 var fileName string
+var timer int
+var numberOfQuestions int
+var rightAnswers int
 
 func init() {
 	flag.StringVar(&fileName, "file", "problems.csv", "Path of quiz file")
+	flag.IntVar(&timer, "time", 30, "Time to take quiz in seconds")
 	flag.Parse()
 }
 
@@ -25,6 +30,16 @@ func main() {
 
 	defer file.Close()
 
+	newtimer := time.NewTimer(time.Duration(timer) * time.Second)
+
+	go func() {
+		<-newtimer.C
+
+		fmt.Println("timer Ran out")
+		finalScore(rightAnswers, numberOfQuestions)
+		os.Exit(0)
+	}()
+
 	csvFile := csv.NewReader(file)
 	sliceOfLines, err := csvFile.ReadAll()
 
@@ -32,9 +47,8 @@ func main() {
 		exit("Failed to parse the given csv file")
 	}
 
-	numberOfQuestions := 0
-	rightAnswers := 0
 	problems := parseLines(sliceOfLines)
+	numberOfQuestions = len(problems)
 	for _, problem := range problems {
 		fmt.Println("Question:", problem.question)
 		reader := bufio.NewReader(os.Stdin)
@@ -44,8 +58,11 @@ func main() {
 		if cleanedInput == problem.answer {
 			rightAnswers++
 		}
-		numberOfQuestions++
 	}
+	finalScore(rightAnswers, numberOfQuestions)
+}
+
+func finalScore(rightAnswers int, numberOfQuestions int) {
 	score := (rightAnswers / numberOfQuestions) * 100
 	fmt.Println("This quiz had the following number of questions", numberOfQuestions)
 	fmt.Println("You got the following right", rightAnswers)
