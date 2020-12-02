@@ -30,16 +30,6 @@ func main() {
 
 	defer file.Close()
 
-	newtimer := time.NewTimer(time.Duration(timer) * time.Second)
-
-	go func() {
-		<-newtimer.C
-
-		fmt.Println("timer Ran out")
-		finalScore(rightAnswers, numberOfQuestions)
-		os.Exit(0)
-	}()
-
 	csvFile := csv.NewReader(file)
 	sliceOfLines, err := csvFile.ReadAll()
 
@@ -49,14 +39,25 @@ func main() {
 
 	problems := parseLines(sliceOfLines)
 	numberOfQuestions = len(problems)
+
+	newTimer := time.NewTimer(time.Duration(timer) * time.Second)
 	for _, problem := range problems {
 		fmt.Println("Question:", problem.question)
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Print("Enter answer: ")
-		input, _ := reader.ReadString('\n')
-		cleanedInput := strings.TrimSpace(input)
-		if cleanedInput == problem.answer {
-			rightAnswers++
+		answerCh := make(chan string)
+		go func() {
+			reader := bufio.NewReader(os.Stdin)
+			fmt.Print("Enter answer: ")
+			input, _ := reader.ReadString('\n')
+			cleanedInput := strings.TrimSpace(input)
+			answerCh <- cleanedInput
+		}()
+		select {
+		case <-newTimer.C:
+			break
+		case answer := <-answerCh:
+			if answer == problem.answer {
+				rightAnswers++
+			}
 		}
 	}
 	finalScore(rightAnswers, numberOfQuestions)
